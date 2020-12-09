@@ -1,5 +1,7 @@
 #pragma once
 
+#include <GameData.h>
+
 // base state class
 class State
 {
@@ -9,6 +11,8 @@ public:
 
 	// list of states
 	const short int CURRENTSTATE = 0;
+	// game data
+	GameData *gameData;
 
 	// perform update actions and return the next state
 	virtual int update();

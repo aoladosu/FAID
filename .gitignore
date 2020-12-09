@@ -367,5 +367,4 @@ ASALocalRun/
 *.app
 
 # mine
-notes.txt
-chessPieces/
+stages/
