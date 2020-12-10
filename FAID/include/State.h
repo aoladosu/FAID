@@ -1,6 +1,7 @@
 #pragma once
 
-#include <GameData.h>
+#include "GameData.h"
+#include "StateData.h"
 
 // base state class
 class State
@@ -8,18 +9,17 @@ class State
 public:
 
 	State();
+	State(GameData *gameData);
 
-	// list of states
-	const short int CURRENTSTATE = 0;
 	// game data
-	GameData *gameData;
+	GameData *gameData=0;
 
 	// perform update actions and return the next state
-	virtual int update();
+	virtual int update(StateNumber &stateVal) = 0;
 	// perform any actions needed upon entering state
-	virtual void enterState();
+	virtual void enterState(StateData stateData) = 0;
 	// perform any actions needed upon exiting state
-	virtual void exitState();
+	virtual StateData exitState() = 0;
 
 };
 

@@ -20,13 +20,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\FAID.cpp" />
+    <ClCompile Include="src\GameData.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\RaceState.cpp" />
+    <ClCompile Include="src\StartState.cpp" />
     <ClCompile Include="src\State.cpp" />
+    <ClCompile Include="src\StateData.cpp" />
     <ClCompile Include="src\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FAID.h" />
+    <ClInclude Include="include\GameData.h" />
+    <ClInclude Include="include\RaceState.h" />
+    <ClInclude Include="include\StartState.h" />
     <ClInclude Include="include\State.h" />
+    <ClInclude Include="include\StateData.h" />
     <ClInclude Include="include\Util.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -8,21 +8,27 @@ class GameData
 {
 public:
 	
+	GameData();
+
 	// car position mem locations
-	uintptr_t xAddr;
-	uintptr_t yAddr;
-	uintptr_t zAddr;
+	uintptr_t xAddr = 0;
+	uintptr_t yAddr = 0;
+	uintptr_t zAddr = 0;
 
 	// control mem location
-	uintptr_t controls;
+	uintptr_t ctrlAddr = 0;
 
 	// enemy position locations
-	uintptr_t enemyPos;
+	uintptr_t enemyPosAddr = 0;
 
 	// stage obstacles
-	int *chkPts;
-	int *obstacles;
-	int *jumps;
+	short int stage = 0;
+	short int chkPtsSize = 0;
+	short int obsSize = 0;
+	short int jumpsSize = 0;
+	int *chkPts = 0;
+	int *obstacles = 0;
+	int *jumps = 0;
 
 };
 

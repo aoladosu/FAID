@@ -1,12 +1,16 @@
 #include "State.h"
 
+State::State(GameData* gameData): gameData(gameData){}
+
 State::State(){}
 
-int State::update()
+int State::update(StateNumber& stateVal)
 {
-	return CURRENTSTATE;
+	return 0;
 }
 
-void State::enterState(){}
+void State::enterState(StateData stateData) {}
 
-void State::exitState(){}
+StateData State::exitState(){
+	return StateData();
+}
