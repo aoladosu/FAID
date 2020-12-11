@@ -11,6 +11,7 @@ class FAID
 private:
 	// variables
 	State *currState;
+	State *pastState;
 	State *startState;
 	State *raceState;
 	GameData gameData;

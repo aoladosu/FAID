@@ -27,33 +27,50 @@ int main()
 	// get memory locations
 
 	// get checkpoint
-	char chkPointModule[] = "dcpr.dll";
+	char dcprModule[] = "dcpr.dll";
 	int chkPointOffsets[] = {0x4, 0x304, 0x48, 0xD4, 0x3C};
 	int size = 5;
-	uintptr_t baseAddr = GetModuleBaseAddress(pid, chkPointModule);
+	uintptr_t baseAddr = GetModuleBaseAddress(pid, dcprModule);
 	baseAddr = baseAddr + 0x00207AC;
 	uintptr_t chkPointMem = followPointer(processHandle, baseAddr, chkPointOffsets, size);
 
 	// get controls
-	char controlModule[] = "awt.dll";
+	char awtModule[] = "awt.dll";
 	int controlOffsets[] = { 0xC, 0x14, 0x184, 0xE4, 0xC4 };
-	baseAddr = GetModuleBaseAddress(pid, controlModule);
+	baseAddr = GetModuleBaseAddress(pid, awtModule);
 	baseAddr = baseAddr + 0x000F94E4;
 	uintptr_t controlsMem = followPointer(processHandle, baseAddr, controlOffsets, size);
 
+	// get x address
+	int xOffsets[] = { 0x4, 0x304, 0x48, 0xAC, 0x5DC };
+	baseAddr = GetModuleBaseAddress(pid, dcprModule);
+	baseAddr = baseAddr + 0x00207AC;
+	uintptr_t xMem = followPointer(processHandle, baseAddr, xOffsets, size);
+
+	// get y address
+	int yOffsets[] = { 0x4, 0x304, 0x48, 0xE8, 0xC };
+	baseAddr = GetModuleBaseAddress(pid, dcprModule);
+	baseAddr = baseAddr + 0x00207AC;
+	uintptr_t yMem = followPointer(processHandle, baseAddr, yOffsets, size);
+
 	// get stage data
-	int *chkPoints=0, stage=1;
+	int *chkPoints=0, stage=3, nlaps;
 	countStageData(stage, size);
-	if (getStageData(stage, size, chkPoints) < 0) {
+	if (getStageData(stage, size, chkPoints, nlaps) < 0) {
 		std::cout << "Couldn't get stage data\n";
 	}
 
 	// set up game data
 	GameData gameData;
+	gameData.process = processHandle;
 	gameData.chkPts = chkPoints;
 	gameData.chkPtsSize = size;
 	gameData.ctrlAddr = controlsMem;
 	gameData.stage = stage;
+	gameData.chkPtAddr = chkPointMem;
+	gameData.laps = nlaps;
+	gameData.xAddr = xMem;
+	gameData.yAddr = yMem;
 
 	FAID faid(gameData, processHandle);
 	std::cout << "Starting agent\n";

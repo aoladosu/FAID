@@ -17,7 +17,7 @@ void countStageData(int stage, int &chkSize)
 	
 	std::ifstream file("stages/" + std::to_string(stage) + ".txt");
 	std::string line, chkPtStr = "chk";
-	int chkPtCount=0;
+	int chkPtCount = 0;
 
 	if (!file.good()) {
 		return;
@@ -31,18 +31,20 @@ void countStageData(int stage, int &chkSize)
 	file.close();
 }
 
-int getStageData(int stage, int chkSize, int *&chkPoints)
+int getStageData(int stage, int chkSize, int *&chkPoints, int &nlaps)
 {
 	// read file to get stage data into malloced array
 
 	std::ifstream file("stages/" + std::to_string(stage) + ".txt");
-	std::string line, chkPtStr = "chk";
+	std::string line, chkPtStr = "chk", lapStr = "nlaps";
 	if (!file.good()) {
 		return -1;
 	}
 
 	// 3 because x,y,z angle will be packed next to each other
-	chkPoints = (int*) malloc(chkSize*3*4);
+	// 4 for size of int
+	// +1 for edge case
+	chkPoints = (int*) malloc((chkSize+1)*3*4);
 	if (chkPoints == nullptr) {
 		return -1;
 	}
@@ -58,8 +60,15 @@ int getStageData(int stage, int chkSize, int *&chkPoints)
 			chkPoints[i+2] = angle;
 			i += 3;
 		}
+		if (line.find(lapStr) != std::string::npos) {
+			std::istringstream iss(line);
+			iss >> c >> c >> c >> c  >> c >> c >> nlaps;
+		}
 	}
 
+	chkPoints[i] = 0;
+	chkPoints[i+1] = 0;
+	chkPoints[i+2] = 0;
 	file.close();
 	return 0;
 }
@@ -102,6 +111,19 @@ uintptr_t followPointer(HANDLE processHandle, uintptr_t address, int offsets[], 
 		address = readAddress + offsets[i];
 	}
 	return address;
+}
+
+// driving
+bool reachedPoint(int x, int y, int z, int goalX, int goalY, int goalZ)
+{
+	// check if goal is reached within some tolerance
+	int tolZ = 50;
+	int tolerance = 50;
+
+	int dist = (goalX - x) * (goalX - x) + (goalY - y) * (goalY - y);
+	int distZ = abs(goalZ - z);
+	
+	return (distZ <= tolZ) && (dist <= tolerance);
 }
 
 

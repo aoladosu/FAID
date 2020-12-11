@@ -4,6 +4,7 @@
 #include "RaceState.h"
 #include <chrono>
 #include <thread>
+#include <iostream>
 
 
 FAID::FAID(GameData gameData, HANDLE process) : gameData(gameData), process(process)
@@ -13,6 +14,7 @@ FAID::FAID(GameData gameData, HANDLE process) : gameData(gameData), process(proc
 	startState = new StartState(&this->gameData);
 	raceState = new RaceState(&this->gameData);
 	currState = startState;
+	pastState = startState;
 }
 
 FAID::~FAID()
@@ -27,9 +29,12 @@ void FAID::play() {
 	// change state as necesary
 
 	int controls;
-	bool gameOver = false;
+	int numChkPt = gameData.laps * gameData.chkPtsSize;
+	int chkPtCount;
+	bool gameOver = true;
 	StateNumber nextState;
 	StateData data;
+	State *temp;
 
 	currState->enterState(data);
 
@@ -38,14 +43,18 @@ void FAID::play() {
 
 		// write button press to memory
 		controls = currState->update(nextState);
-		int h = WriteProcessMemory(process, (LPVOID)gameData.ctrlAddr, &controls, sizeof(controls), NULL);
+		WriteProcessMemory(process, (LPVOID)gameData.ctrlAddr, &controls, sizeof(controls), NULL);
 		
 		// switch state and handle entering and exiting
 		if (nextState != StateNumber::CurrentState) {
 			data = currState->exitState();
+			temp = currState;
 			switch (nextState) {
 			case StateNumber::StartState:
 				currState = startState;
+				break;
+			case StateNumber::PastState:
+				currState = pastState;
 				break;
 			case StateNumber::RaceState:
 				currState = raceState;
@@ -54,12 +63,14 @@ void FAID::play() {
 				break;
 			}
 			currState->enterState(data);
+			pastState = temp;
 		}
 
 		// check if race is over
-		if (gameOver) {
+		ReadProcessMemory(process, (LPVOID)gameData.chkPtAddr, &chkPtCount, sizeof(chkPtCount), NULL);
+		if ((chkPtCount == numChkPt) || nextState == StateNumber::EndRace) {
 			break;
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(4));
+		std::this_thread::sleep_for(std::chrono::milliseconds(3));
 	}
 }

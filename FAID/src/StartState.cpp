@@ -17,15 +17,25 @@ int StartState::update(StateNumber &stateVal)
 	else {
 		stateVal = StateNumber::CurrentState;
 	}
-	return 0;
+	return idle;
 }
 
 void StartState::enterState(StateData stateData)
 {
+	std::cout << "entering start state\n";
 	timer = std::chrono::steady_clock::now();
 }
 
 StateData StartState::exitState()
 {
-	return StateData();
+	std::cout << "exiting start state\n";
+
+	StateData data = StateData();
+	int x, y, z = 0;
+	ReadProcessMemory(gameData->process, (LPVOID)gameData->xAddr, &x, sizeof(x), NULL);
+	ReadProcessMemory(gameData->process, (LPVOID)gameData->yAddr, &y, sizeof(y), NULL);
+	data.oldX = x;
+	data.oldY = y;
+	data.oldZ = 0;
+	return data;
 }

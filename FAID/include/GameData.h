@@ -10,6 +10,9 @@ public:
 	
 	GameData();
 
+	// process handle
+	HANDLE process;
+
 	// car position mem locations
 	uintptr_t xAddr = 0;
 	uintptr_t yAddr = 0;
@@ -21,7 +24,11 @@ public:
 	// enemy position locations
 	uintptr_t enemyPosAddr = 0;
 
-	// stage obstacles
+	// checkpoint address
+	uintptr_t chkPtAddr = 0;
+
+	// stage data
+	short int laps = 0;
 	short int stage = 0;
 	short int chkPtsSize = 0;
 	short int obsSize = 0;
