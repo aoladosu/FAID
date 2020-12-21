@@ -83,18 +83,19 @@ void RaceState::adjustGoal()
 int RaceState::getDriveDirection()
 {
 	// return the direction to go to reach the goal
-	int direction = 0;
+	int direction = up;
 	int goalDirX = goalX - oldX;
 	int goalDirY = goalY - oldY;
 
 	// look at dot product to get angle between vectors to decide how hard to turn
+	// or to turn at all
 	int dot = dirX * (goalDirX)+dirY * (goalDirY);
 	float lenDir = sqrt(dirX * dirX + dirY * dirY);
 	float lenGoal = sqrt(goalDirX * goalDirX + goalDirY * goalDirY);
 	float angle = acos(dot / (lenDir * lenGoal)) * 180 / PI;
-	if (!((angle >= 45) && (angle <= 90)) && !((angle <= -45) && (angle >= -90))) {
-		direction |= up;
-	}
+	//if (!((angle >= 45) && (angle <= 90)) && !((angle <= -45) && (angle >= -90))) {
+	//	direction |= up;
+	//}
 
 	// if we are within 10 degrees of target, then we are fine
 	if ((angle < 10) && !isnan(angle)) {
