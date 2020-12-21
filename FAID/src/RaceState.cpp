@@ -87,6 +87,20 @@ int RaceState::getDriveDirection()
 	int goalDirX = goalX - oldX;
 	int goalDirY = goalY - oldY;
 
+	// look at dot product to get angle between vectors to decide how hard to turn
+	int dot = dirX * (goalDirX)+dirY * (goalDirY);
+	float lenDir = sqrt(dirX * dirX + dirY * dirY);
+	float lenGoal = sqrt(goalDirX * goalDirX + goalDirY * goalDirY);
+	float angle = acos(dot / (lenDir * lenGoal)) * 180 / PI;
+	if (!((angle >= 45) && (angle <= 90)) && !((angle <= -45) && (angle >= -90))) {
+		direction |= up;
+	}
+
+	// if we are within 10 degrees of target, then we are fine
+	if ((angle < 10) && !isnan(angle)) {
+		return up;
+	}
+
 	// cross product, get z component to decide turn direction
 	int zComp = (goalDirX) * dirY - (goalDirY) * dirX;
 
@@ -109,14 +123,5 @@ int RaceState::getDriveDirection()
 		direction |= left;
 	}
 
-	// look at dot product to get angle between vectors to decide how hard to turn
-	int dot = dirX * (goalDirX) + dirY * (goalDirY);
-	double lenDir = sqrt(dirX * dirX + dirY * dirY);
-	double lenGoal = sqrt(goalDirX * goalDirX + goalDirY * goalDirY);
-	double angle = acos(dot / (lenDir * lenGoal)) * 180 / PI;
-	if ( !((angle >= 45) && (angle <=90)) && !((angle <= -45) && (angle >= -90)) ){
-		direction |= up;
-	}
-	
 	return direction;
 }

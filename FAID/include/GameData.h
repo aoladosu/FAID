@@ -9,6 +9,7 @@ class GameData
 public:
 	
 	GameData();
+	void print();
 
 	// process handle
 	HANDLE process;

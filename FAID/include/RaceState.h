@@ -13,7 +13,7 @@ private:
 	// variables
 	short int currChkPt = 0;
 	bool goalReached = false;
-	const double PI = 3.14159;
+	const float PI = 3.14159;
 
 	// functions
 	void setGoal();
