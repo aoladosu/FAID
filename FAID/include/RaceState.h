@@ -1,5 +1,12 @@
 #pragma once
 #include "State.h"
+
+
+/*
+* this state moves the car toward each checkpoint
+* it transitions to avoid state if there is an obstacle in the way
+*/
+
 class RaceState : public State
 {
 public:
@@ -11,8 +18,7 @@ public:
 
 private:
 	// variables
-	short int currChkPt = 0;
-	bool goalReached = false;
+	short int currChkPt = -1;
 	const float PI = 3.14159;
 
 	// functions

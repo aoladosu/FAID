@@ -1,5 +1,5 @@
 #include "RaceState.h"
-#include "Util.h"
+#include "CollisionUtil.h"
 #include <cmath>
 #include <iostream>
 
@@ -8,55 +8,75 @@ RaceState::RaceState(GameData* gameData) : State(gameData){}
 int RaceState::update(StateNumber& stateVal)
 {
 	// check if goal has been reached
-	int x, y, z=0;
-	ReadProcessMemory(gameData->process, (LPVOID)gameData->xAddr, &x, sizeof(x), NULL);
-	ReadProcessMemory(gameData->process, (LPVOID)gameData->yAddr, &y, sizeof(y), NULL);
-	//ReadProcessMemory(gameData->process, (LPVOID)gameData->zAddr, &z, sizeof(z), NULL);
-	//goalReached = goalReached || reachedPoint(x,y,z, goalX,goalY,goalZ);
+	int newX, newY, newZ=0;
+	ReadProcessMemory(gameData->process, (LPVOID)gameData->xAddr, &newX, sizeof(newX), NULL);
+	ReadProcessMemory(gameData->process, (LPVOID)gameData->yAddr, &newY, sizeof(newY), NULL);
+	//ReadProcessMemory(gameData->process, (LPVOID)gameData->zAddr, &newZ, sizeof(z), NULL);
 
-	// get a new goal if goal is reached
+	// get goal to drive to
 	setGoal();
 	adjustGoal();
 
 
 	// update variables
-	if ((y != oldY) || (x != oldX)){
-		dirX = x - oldX;
-		dirY = y - oldY;
-		oldX = x;
-		oldY = y;
-		oldZ = z;
+	if ((newY != Y) || (newX != X)){
+		dirX = newX - X;
+		dirY = newY - Y;
+		X = newX;
+		Y = newY;
+		Z = newZ;
 	}
 
+	// get direction to drive towards
 	int direction = getDriveDirection();
+
+	// determine state transition
+	int obsLoc;
+	bool isJump;
 	stateVal = StateNumber::CurrentState;
+
+	if (obsCollision(gameData->jumps, gameData->jumpsSize, gameData->obstacles, gameData->obsSize, X, Y, obsLoc, isJump)) {
+		// colliding with obstacle
+		
+		int xPos, yPos;
+		if (isJump) {
+			xPos = gameData->jumps[obsLoc + 1];
+			yPos = gameData->jumps[obsLoc + 2];
+		}
+		else {
+			xPos = gameData->obstacles[obsLoc + 1];
+			yPos = gameData->obstacles[obsLoc + 2];
+		}
+		
+		if (distSquared(X, Y, xPos, yPos) < distSquared(X, Y, goalX, goalY)) {
+			// check if obstacle collision is behind goal location first
+			stateVal = StateNumber::AvoidState;
+		}
+	}
+	
 	return direction;
 }
 
 void RaceState::enterState(StateData stateData)
 {
-	std::cout << "entering race state\n";
+	std::cout << "Entering race state\n";
 
 	// copy information passed on from previous state
-	oldX = stateData.oldX;
-	oldY = stateData.oldY;
-	oldZ = stateData.oldZ;
-
-	// update current checkpoint incase another state passed through a checkpoint
-	setGoal();
-	adjustGoal();
+	X = stateData.X;
+	Y = stateData.Y;
+	Z = stateData.Z;
 
 }
 
 StateData RaceState::exitState()
 {
 
-	std::cout << "exiting start state\n";
+	std::cout << "Exiting race state\n";
 
 	StateData stateData = StateData();
-	stateData.oldX = oldX;
-	stateData.oldY = oldY;
-	stateData.oldZ = oldZ;
+	stateData.X = X;
+	stateData.Y = Y;
+	stateData.Z = Z;
 	stateData.goalX = goalX;
 	stateData.goalY = goalY;
 	stateData.valid = true;
@@ -67,11 +87,15 @@ StateData RaceState::exitState()
 void RaceState::setGoal()
 {
 	// set the goal of this state to the next checkpoint
-	ReadProcessMemory(gameData->process, (LPVOID)gameData->chkPtAddr, &currChkPt, sizeof(currChkPt), NULL);
-	int offset = (currChkPt % gameData->chkPtsSize) * 3;
-	goalX = gameData->chkPts[offset];
-	goalY = gameData->chkPts[offset+1];
-	goalZ = 0;
+	int newChkPt;
+	ReadProcessMemory(gameData->process, (LPVOID)gameData->chkPtAddr, &newChkPt, sizeof(newChkPt), NULL);
+	if (newChkPt != currChkPt) {
+		currChkPt = newChkPt;
+		int offset = (newChkPt % gameData->chkPtsSize) * 3;
+		goalX = gameData->chkPts[offset];
+		goalY = gameData->chkPts[offset + 1];
+		goalZ = 0;
+	}
 }
 
 void RaceState::adjustGoal()
@@ -84,8 +108,8 @@ int RaceState::getDriveDirection()
 {
 	// return the direction to go to reach the goal
 	int direction = up;
-	int goalDirX = goalX - oldX;
-	int goalDirY = goalY - oldY;
+	int goalDirX = goalX - X;
+	int goalDirY = goalY - Y;
 
 	// look at dot product to get angle between vectors to decide how hard to turn
 	// or to turn at all
@@ -93,12 +117,9 @@ int RaceState::getDriveDirection()
 	float lenDir = sqrt(dirX * dirX + dirY * dirY);
 	float lenGoal = sqrt(goalDirX * goalDirX + goalDirY * goalDirY);
 	float angle = acos(dot / (lenDir * lenGoal)) * 180 / PI;
-	//if (!((angle >= 45) && (angle <= 90)) && !((angle <= -45) && (angle >= -90))) {
-	//	direction |= up;
-	//}
 
 	// if we are within 10 degrees of target, then we are fine
-	if ((angle < 10) && !isnan(angle)) {
+	if ((angle < 8) && !isnan(angle)) {
 		return up;
 	}
 

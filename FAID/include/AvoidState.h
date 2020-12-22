@@ -1,19 +1,19 @@
 #pragma once
 #include "State.h"
+
 #include <chrono>
 
-
-/* 
-* this state waits 3 seconds at the beginning of the race
-* then transitions to the race state
+/*
+* this state avoids stationary objects
+* It handles one at a time before handing control back to the 
+* state that called it
 */
 
-class StartState : public State
+class AvoidState : public State
 {
-
 public:
-	StartState(GameData *gameData);
-	
+	AvoidState(GameData* gameData);
+
 	int update(StateNumber& stateVal) override;
 	void enterState(StateData stateData) override;
 	StateData exitState() override;

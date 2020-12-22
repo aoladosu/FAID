@@ -51,29 +51,39 @@ int main()
 	uintptr_t yMem = followPointer(processHandle, baseAddr, yOffsets, size);
 
 	// get stage data
-	int *chkPoints=0, stage=1, nlaps;
-	countStageData(stage, size);
-	if (getStageData(stage, size, chkPoints, nlaps) < 0) {
+	int stage=3;
+	int chkPtSize, obsSize, jumpSize, nlaps;
+	int *jumps = 0, *chkPoints = 0, *obstacles = 0;
+	countStageData(stage, chkPtSize, jumpSize, obsSize);
+	if (getStageData(stage, chkPtSize, chkPoints, jumpSize, jumps, obsSize, obstacles, nlaps) < 0) {
 		std::cout << "Couldn't get stage data\n";
 	}
 
 	// set up game data
 	GameData gameData;
 	gameData.process = processHandle;
-	gameData.chkPts = chkPoints;
-	gameData.chkPtsSize = size;
 	gameData.ctrlAddr = controlsMem;
-	gameData.stage = stage;
 	gameData.chkPtAddr = chkPointMem;
-	gameData.laps = nlaps;
 	gameData.xAddr = xMem;
 	gameData.yAddr = yMem;
+	gameData.stage = stage;
+	gameData.laps = nlaps;
+	gameData.chkPts = chkPoints;
+	gameData.chkPtsSize = chkPtSize;
+	gameData.jumpsSize = jumpSize;
+	gameData.jumps = jumps;
+	gameData.obsSize = obsSize;
+	gameData.obstacles = obstacles;
 
 	FAID faid(gameData, processHandle);
 	std::cout << "Starting agent\n";
 	faid.play();
 
 	free(chkPoints);
+	free(jumps);
+	free(obstacles);
+
+	return 0;
 }
 
 

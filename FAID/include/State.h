@@ -31,9 +31,9 @@ protected:
 	int space = 0x01;
 
 	// car info
-	int oldX = 0;
-	int oldY = 0;
-	int oldZ = 0;
+	int X = 0;
+	int Y = 0;
+	int Z = 0;
 	int dirX = 0;
 	int dirY = 0;
 	int goalX = 0;

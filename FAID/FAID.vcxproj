@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AvoidState.cpp" />
+    <ClCompile Include="src\CollisionUtil.cpp" />
     <ClCompile Include="src\FAID.cpp" />
     <ClCompile Include="src\GameData.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -29,6 +31,8 @@
     <ClCompile Include="src\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\AvoidState.h" />
+    <ClInclude Include="include\CollisionUtil.h" />
     <ClInclude Include="include\FAID.h" />
     <ClInclude Include="include\GameData.h" />
     <ClInclude Include="include\RaceState.h" />

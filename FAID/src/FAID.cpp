@@ -2,6 +2,7 @@
 #include "StateData.h"
 #include "StartState.h"
 #include "RaceState.h"
+#include "AvoidState.h"
 #include <chrono>
 #include <thread>
 #include <iostream>
@@ -13,6 +14,7 @@ FAID::FAID(GameData gameData, HANDLE process) : gameData(gameData), process(proc
 	
 	startState = new StartState(&this->gameData);
 	raceState = new RaceState(&this->gameData);
+	avoidState = new AvoidState(&this->gameData);
 	currState = startState;
 	pastState = startState;
 }
@@ -21,6 +23,7 @@ FAID::~FAID()
 {
 	delete startState;
 	delete raceState;
+	delete avoidState;
 }
 
 void FAID::play() {
@@ -58,6 +61,9 @@ void FAID::play() {
 				break;
 			case StateNumber::RaceState:
 				currState = raceState;
+				break;
+			case StateNumber::AvoidState:
+				currState = avoidState;
 				break;
 			default:
 				break;

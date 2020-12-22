@@ -1,34 +1,42 @@
-#include "StartState.h"
+#include "AvoidState.h"
+
 #include <iostream>
 
+AvoidState::AvoidState(GameData* gameData) : State(gameData) {}
 
-
-StartState::StartState(GameData *gameData): State(gameData){}
-
-int StartState::update(StateNumber &stateVal)
+int AvoidState::update(StateNumber& stateVal)
 {
 	// change state once 3 seconds have passed
 	auto end = std::chrono::steady_clock::now();
 	std::chrono::duration<double> elapsed = end - timer;
 
-	if (elapsed.count() >= 3) {
+	if (elapsed.count() >= 2) {
 		stateVal = StateNumber::RaceState;
 	}
 	else {
 		stateVal = StateNumber::CurrentState;
 	}
-	return idle;
+	return up|right;
 }
 
-void StartState::enterState(StateData stateData)
+void AvoidState::enterState(StateData stateData)
 {
-	std::cout << "Entering start state\n";
+	std::cout << "Entering avoid state\n";
+
+	// copy information passed on from previous state
+	X = stateData.X;
+	Y = stateData.Y;
+	Z = stateData.Z;
+	goalX = stateData.goalX;
+	goalY = stateData.goalY;
+
+
 	timer = std::chrono::steady_clock::now();
 }
 
-StateData StartState::exitState()
+StateData AvoidState::exitState()
 {
-	std::cout << "Exiting start state\n";
+	std::cout << "Exiting avoid state\n";
 
 	StateData data = StateData();
 	int x, y;

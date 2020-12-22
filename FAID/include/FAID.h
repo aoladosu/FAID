@@ -14,6 +14,7 @@ private:
 	State *pastState;
 	State *startState;
 	State *raceState;
+	State* avoidState;
 	GameData gameData;
 	HANDLE process;
 
