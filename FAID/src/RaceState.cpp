@@ -31,28 +31,7 @@ int RaceState::update(StateNumber& stateVal)
 	int direction = getDriveDirection();
 
 	// determine state transition
-	int obsLoc;
-	bool isJump;
-	stateVal = StateNumber::CurrentState;
-
-	if (obsCollision(gameData->jumps, gameData->jumpsSize, gameData->obstacles, gameData->obsSize, X, Y, dirX, dirY, obsLoc, isJump)) {
-		// colliding with obstacle
-		
-		int xPos, yPos;
-		if (isJump) {
-			xPos = gameData->jumps[obsLoc + 1];
-			yPos = gameData->jumps[obsLoc + 2];
-		}
-		else {
-			xPos = gameData->obstacles[obsLoc + 1];
-			yPos = gameData->obstacles[obsLoc + 2];
-		}
-		
-		if (distSquared(X, Y, xPos, yPos) < distSquared(X, Y, goalX, goalY)) {
-			// check if obstacle collision is behind goal location first
-			stateVal = StateNumber::AvoidState;
-		}
-	}
+	stateVal = nextState();
 	
 	return direction;
 }
@@ -84,6 +63,35 @@ StateData RaceState::exitState()
 	stateData.valid = true;
 
 	return stateData;
+}
+
+StateNumber RaceState::nextState()
+{
+	// determine state transition
+	int obsLoc;
+	bool isJump;
+	StateNumber stateVal = StateNumber::CurrentState;
+
+	if (obsCollision(gameData->jumps, gameData->jumpsSize, gameData->obstacles, gameData->obsSize, X, Y, dirX, dirY, obsLoc, isJump)) {
+		// colliding with obstacle
+
+		int xPos, yPos;
+		if (isJump) {
+			xPos = gameData->jumps[obsLoc + 1];
+			yPos = gameData->jumps[obsLoc + 2];
+		}
+		else {
+			xPos = gameData->obstacles[obsLoc + 1];
+			yPos = gameData->obstacles[obsLoc + 2];
+		}
+
+		if (distSquared(X, Y, xPos, yPos) < distSquared(X, Y, goalX, goalY)) {
+			// check if obstacle collision is behind goal location first
+			stateVal = StateNumber::AvoidState;
+		}
+	}
+
+	return stateVal;
 }
 
 void RaceState::setGoal()

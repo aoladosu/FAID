@@ -19,6 +19,7 @@ public:
 	StateData exitState() override;
 
 private:
+	// variables
 	int obstacleNum = -1;
 	bool isJump = false;
 	bool onJumpDir = false;
@@ -29,5 +30,8 @@ private:
 	// not where this state wants to go
 	int endGoalX = 0;
 	int endGoalY = 0;
+
+	// functions
+	StateNumber nextState() override;
 };
 

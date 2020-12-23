@@ -6,7 +6,7 @@ State::State(){}
 
 int State::update(StateNumber& stateVal)
 {
-	return 0;
+	return idle;
 }
 
 void State::enterState(StateData stateData) {}

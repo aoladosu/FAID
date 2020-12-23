@@ -8,8 +8,6 @@ AvoidState::AvoidState(GameData* gameData) : State(gameData) {}
 int AvoidState::update(StateNumber& stateVal)
 {
 
-	int direction = up;
-
 	// update variables
 	int newX, newY, newZ = 0;
 	ReadProcessMemory(gameData->process, (LPVOID)gameData->xAddr, &newX, sizeof(newX), NULL);
@@ -23,16 +21,9 @@ int AvoidState::update(StateNumber& stateVal)
 	}
 
 	// change state if no collision, or new object to avoid
-	stateVal = StateNumber::CurrentState;
-	int newObstacleNum;
-	bool newIsJump;
-	if (obsCollision(gameData->jumps, gameData->jumpsSize, gameData->obstacles, gameData->obsSize, X, Y, dirX, dirY, newObstacleNum, newIsJump)){
-		if ((obstacleNum != newObstacleNum) || (newIsJump != isJump)) stateVal = StateNumber::PastState;
-	}
-	else {
-		stateVal = StateNumber::PastState;
-	}
+	stateVal = nextState();
 
+	int direction = up;
 	return direction;
 }
 
@@ -76,4 +67,20 @@ StateData AvoidState::exitState()
 	data.Y = y;
 	data.Z = 0;
 	return data;
+}
+
+StateNumber AvoidState::nextState()
+{
+	// change state if no collision, or new object to avoid
+	StateNumber stateVal = StateNumber::CurrentState;
+	int newObstacleNum;
+	bool newIsJump;
+	if (obsCollision(gameData->jumps, gameData->jumpsSize, gameData->obstacles, gameData->obsSize, X, Y, dirX, dirY, newObstacleNum, newIsJump)) {
+		if ((obstacleNum != newObstacleNum) || (newIsJump != isJump)) stateVal = StateNumber::PastState;
+	}
+	else {
+		stateVal = StateNumber::PastState;
+	}
+
+	return stateVal;
 }

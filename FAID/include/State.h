@@ -18,6 +18,9 @@ public:
 	// perform any actions needed upon exiting state
 	virtual StateData exitState() = 0;
 
+private:
+	virtual StateNumber nextState() = 0;
+
 protected:
 	// game data
 	GameData* gameData = 0;
