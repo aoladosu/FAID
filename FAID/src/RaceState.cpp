@@ -7,20 +7,8 @@ RaceState::RaceState(GameData* gameData) : State(gameData){}
 
 int RaceState::update(StateNumber& stateVal)
 {
-	// update position variables
-	int newX, newY, newZ=0;
-	ReadProcessMemory(gameData->process, (LPVOID)gameData->xAddr, &newX, sizeof(newX), NULL);
-	ReadProcessMemory(gameData->process, (LPVOID)gameData->yAddr, &newY, sizeof(newY), NULL);
-	//ReadProcessMemory(gameData->process, (LPVOID)gameData->zAddr, &newZ, sizeof(z), NULL);
-
-	// update variables
-	if ((newY != Y) || (newX != X)){
-		dirX = newX - X;
-		dirY = newY - Y;
-		X = newX;
-		Y = newY;
-		Z = newZ;
-	}
+	// update car variables
+	updateCarInfo();
 
 	// get goal to drive to
 	setGoal();
@@ -31,19 +19,16 @@ int RaceState::update(StateNumber& stateVal)
 
 	// determine state transition
 	stateVal = nextState();
-	
+
 	return direction;
 }
 
 void RaceState::enterState(StateData stateData)
 {
 	std::cout << "Entering race state\n";
-
-	// copy information passed on from previous state
 	X = stateData.X;
 	Y = stateData.Y;
 	Z = stateData.Z;
-
 }
 
 StateData RaceState::exitState()

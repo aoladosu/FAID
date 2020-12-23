@@ -21,6 +21,8 @@ public:
 private:
 	// timer for how long to stay in this state
 	std::chrono::steady_clock::time_point timer;
+
+protected:
 	StateNumber nextState() override;
 };
 

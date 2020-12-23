@@ -3,6 +3,8 @@
 #include "State.h"
 #include "GameData.h"
 
+#include <string>
+
 
 class FAID
 {
@@ -17,13 +19,14 @@ private:
 	State* avoidState;
 	GameData gameData;
 	HANDLE process;
+	void memoryErrorPrint(bool read, uintptr_t addr, std::string addrName);
 
 public:
-
 	// functions
 	FAID(GameData gameData, HANDLE process);
 	~FAID();
 	void play();
+	bool verifyMemory();
 
 	
 };

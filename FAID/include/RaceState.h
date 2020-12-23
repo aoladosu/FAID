@@ -22,10 +22,12 @@ private:
 	const float PI = 3.14159;
 
 	// functions
-	StateNumber nextState() override;
 	void setGoal();
 	void adjustGoal();
 	int getDriveDirection();
+
+protected:
+	StateNumber nextState() override;
 
 };
 

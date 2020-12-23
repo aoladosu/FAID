@@ -7,18 +7,8 @@ AvoidState::AvoidState(GameData* gameData) : State(gameData) {}
 
 int AvoidState::update(StateNumber& stateVal)
 {
-
-	// update variables
-	int newX, newY, newZ = 0;
-	ReadProcessMemory(gameData->process, (LPVOID)gameData->xAddr, &newX, sizeof(newX), NULL);
-	ReadProcessMemory(gameData->process, (LPVOID)gameData->yAddr, &newY, sizeof(newY), NULL);
-	if ((newY != Y) || (newX != X)) {
-		dirX = newX - X;
-		dirY = newY - Y;
-		X = newX;
-		Y = newY;
-		Z = newZ;
-	}
+	// update car variables
+	updateCarInfo();
 
 	// change state if no collision, or new object to avoid
 	stateVal = nextState();

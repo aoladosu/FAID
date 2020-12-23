@@ -31,6 +31,7 @@ private:
 	int endGoalX = 0;
 	int endGoalY = 0;
 
+protected:
 	// functions
 	StateNumber nextState() override;
 };

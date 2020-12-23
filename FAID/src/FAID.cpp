@@ -80,3 +80,56 @@ void FAID::play() {
 		std::this_thread::sleep_for(std::chrono::milliseconds(3));
 	}
 }
+
+bool FAID::verifyMemory()
+{
+	// checks that all memory can be read from and written to
+	int test;
+	bool noError = true;
+
+	// read tests
+	if (!ReadProcessMemory(process, (LPVOID)gameData.xAddr, &test, sizeof(test), NULL)) {
+		memoryErrorPrint(true, gameData.xAddr, "x");
+		noError = false;
+	}
+	if (!ReadProcessMemory(process, (LPVOID)gameData.yAddr, &test, sizeof(test), NULL)) {
+		memoryErrorPrint(true, gameData.yAddr, "y");
+		noError = false;
+	}
+	/*
+	if (!ReadProcessMemory(gameData.process, (LPVOID)gameData.zAddr, &test, sizeof(test), NULL)) {
+		memoryErrorPrint(true, gameData.zAddr, "z");
+		noError = false;
+	}
+	if (!ReadProcessMemory(process, (LPVOID)gameData.enemyPosAddr, &test, sizeof(test), NULL)) {
+		memoryErrorPrint(true, gameData.enemyPosAddr, "EnemyPosition");
+		noError = false;
+	}
+	*/
+	if (!ReadProcessMemory(process, (LPVOID)gameData.chkPtAddr, &test, sizeof(test), NULL)) {
+		memoryErrorPrint(true, gameData.chkPtAddr, "Checkpoint");
+		noError = false;
+	}
+
+	// write tests
+	test = 0;
+	if (!WriteProcessMemory(process, (LPVOID)gameData.ctrlAddr, &test, sizeof(test), NULL)) {
+		memoryErrorPrint(false, gameData.ctrlAddr, "Control");
+		noError = false;
+	}
+
+
+	if (!noError) {
+		std::cout << "Try restarting the level or restarting the game.\n";
+	}
+	return noError;
+}
+
+void FAID::memoryErrorPrint(bool read, uintptr_t addr, std::string addrName) {
+	if (read) {
+		std::cout << "FAID is unable to read from " << addrName << " address: "  << std::hex << addr << "\n";
+	}
+	else {
+		std::cout << "FAID is unable to wrtie to " << addrName << " address: " << std::hex << addr << "\n";
+	}
+}

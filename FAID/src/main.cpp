@@ -77,6 +77,9 @@ int main()
 
 	FAID faid(gameData, processHandle);
 	std::cout << "Starting agent\n";
+	if (!faid.verifyMemory()) {
+		exit(0);
+	}
 	faid.play();
 
 	free(chkPoints);
