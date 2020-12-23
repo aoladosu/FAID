@@ -19,7 +19,15 @@ public:
 	StateData exitState() override;
 
 private:
-	// timer for how long to stay in this state
-	std::chrono::steady_clock::time_point timer;
+	int obstacleNum = -1;
+	bool isJump = false;
+	bool onJumpDir = false;
+	int obsX = 0;
+	int obsY = 0;
+	int obsAngle = 0;
+	// these goal positions are where another position wants to go,
+	// not where this state wants to go
+	int endGoalX = 0;
+	int endGoalY = 0;
 };
 

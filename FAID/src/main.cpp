@@ -51,7 +51,7 @@ int main()
 	uintptr_t yMem = followPointer(processHandle, baseAddr, yOffsets, size);
 
 	// get stage data
-	int stage=3;
+	int stage=1;
 	int chkPtSize, obsSize, jumpSize, nlaps;
 	int *jumps = 0, *chkPoints = 0, *obstacles = 0;
 	countStageData(stage, chkPtSize, jumpSize, obsSize);

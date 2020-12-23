@@ -7,7 +7,7 @@ RaceState::RaceState(GameData* gameData) : State(gameData){}
 
 int RaceState::update(StateNumber& stateVal)
 {
-	// check if goal has been reached
+	// update position variables
 	int newX, newY, newZ=0;
 	ReadProcessMemory(gameData->process, (LPVOID)gameData->xAddr, &newX, sizeof(newX), NULL);
 	ReadProcessMemory(gameData->process, (LPVOID)gameData->yAddr, &newY, sizeof(newY), NULL);
@@ -35,7 +35,7 @@ int RaceState::update(StateNumber& stateVal)
 	bool isJump;
 	stateVal = StateNumber::CurrentState;
 
-	if (obsCollision(gameData->jumps, gameData->jumpsSize, gameData->obstacles, gameData->obsSize, X, Y, obsLoc, isJump)) {
+	if (obsCollision(gameData->jumps, gameData->jumpsSize, gameData->obstacles, gameData->obsSize, X, Y, dirX, dirY, obsLoc, isJump)) {
 		// colliding with obstacle
 		
 		int xPos, yPos;
@@ -79,6 +79,8 @@ StateData RaceState::exitState()
 	stateData.Z = Z;
 	stateData.goalX = goalX;
 	stateData.goalY = goalY;
+	stateData.dirX = dirX;
+	stateData.dirY = dirY;
 	stateData.valid = true;
 
 	return stateData;
@@ -113,13 +115,14 @@ int RaceState::getDriveDirection()
 
 	// look at dot product to get angle between vectors to decide how hard to turn
 	// or to turn at all
-	int dot = dirX * (goalDirX)+dirY * (goalDirY);
+	int dot = dirX * (goalDirX) + dirY * (goalDirY);
 	float lenDir = sqrt(dirX * dirX + dirY * dirY);
 	float lenGoal = sqrt(goalDirX * goalDirX + goalDirY * goalDirY);
 	float angle = acos(dot / (lenDir * lenGoal)) * 180 / PI;
+	int angleOffset = 9;
 
 	// if we are within 10 degrees of target, then we are fine
-	if ((angle < 8) && !isnan(angle)) {
+	if ((angle < angleOffset) && !isnan(angle)) {
 		return up;
 	}
 

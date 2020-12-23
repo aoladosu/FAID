@@ -16,4 +16,6 @@ public:
 	int X = 0;
 	int Y = 0;
 	int Z = 0;
+	int dirX = 0;
+	int dirY = 0;
 };

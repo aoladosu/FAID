@@ -1,4 +1,5 @@
 #include "AvoidState.h"
+#include "CollisionUtil.h"
 
 #include <iostream>
 
@@ -6,17 +7,33 @@ AvoidState::AvoidState(GameData* gameData) : State(gameData) {}
 
 int AvoidState::update(StateNumber& stateVal)
 {
-	// change state once 3 seconds have passed
-	auto end = std::chrono::steady_clock::now();
-	std::chrono::duration<double> elapsed = end - timer;
 
-	if (elapsed.count() >= 2) {
-		stateVal = StateNumber::RaceState;
+	int direction = up;
+
+	// update variables
+	int newX, newY, newZ = 0;
+	ReadProcessMemory(gameData->process, (LPVOID)gameData->xAddr, &newX, sizeof(newX), NULL);
+	ReadProcessMemory(gameData->process, (LPVOID)gameData->yAddr, &newY, sizeof(newY), NULL);
+	if ((newY != Y) || (newX != X)) {
+		dirX = newX - X;
+		dirY = newY - Y;
+		X = newX;
+		Y = newY;
+		Z = newZ;
+	}
+
+	// change state if no collision, or new object to avoid
+	stateVal = StateNumber::CurrentState;
+	int newObstacleNum;
+	bool newIsJump;
+	if (obsCollision(gameData->jumps, gameData->jumpsSize, gameData->obstacles, gameData->obsSize, X, Y, dirX, dirY, newObstacleNum, newIsJump)){
+		if ((obstacleNum != newObstacleNum) || (newIsJump != isJump)) stateVal = StateNumber::PastState;
 	}
 	else {
-		stateVal = StateNumber::CurrentState;
+		stateVal = StateNumber::PastState;
 	}
-	return up|right;
+
+	return direction;
 }
 
 void AvoidState::enterState(StateData stateData)
@@ -27,11 +44,24 @@ void AvoidState::enterState(StateData stateData)
 	X = stateData.X;
 	Y = stateData.Y;
 	Z = stateData.Z;
-	goalX = stateData.goalX;
-	goalY = stateData.goalY;
+	endGoalX = stateData.goalX;
+	endGoalY = stateData.goalY;
+	dirX = stateData.dirX;
+	dirY = stateData.dirY;
 
-
-	timer = std::chrono::steady_clock::now();
+	// get information for what obstacle to avoid
+	obsCollision(gameData->jumps, gameData->jumpsSize, gameData->obstacles, gameData->obsSize, X, Y, dirX, dirY, obstacleNum, isJump);
+	if (isJump) {
+		obsX = gameData->jumps[obstacleNum + 1];
+		obsY = gameData->jumps[obstacleNum + 2];
+		obsAngle = gameData->jumps[obstacleNum + 3];
+		onJumpDir = onJumpDirection(obsX, obsY, dirX, dirY, obsAngle, X, Y);
+	}
+	else {
+		obsX = gameData->obstacles[obstacleNum + 1];
+		obsY = gameData->obstacles[obstacleNum + 2];
+		obsAngle = gameData->obstacles[obstacleNum + 3];
+	}
 }
 
 StateData AvoidState::exitState()
