@@ -7,16 +7,7 @@ StartState::StartState(GameData *gameData): State(gameData){}
 
 int StartState::update(StateNumber &stateVal)
 {
-	// change state once 3 seconds have passed
-	auto end = std::chrono::steady_clock::now();
-	std::chrono::duration<double> elapsed = end - timer;
-
-	if (elapsed.count() >= 3) {
-		stateVal = StateNumber::RaceState;
-	}
-	else {
-		stateVal = StateNumber::CurrentState;
-	}
+	stateVal = nextState();
 	return idle;
 }
 
@@ -38,4 +29,18 @@ StateData StartState::exitState()
 	data.Y = y;
 	data.Z = 0;
 	return data;
+}
+
+StateNumber StartState::nextState()
+{
+	// change state once 3 seconds have passed
+	auto end = std::chrono::steady_clock::now();
+	std::chrono::duration<double> elapsed = end - timer;
+	StateNumber stateVal = StateNumber::CurrentState;
+
+	if (elapsed.count() >= 3) {
+		stateVal = StateNumber::RaceState;
+	}
+
+	return stateVal;
 }

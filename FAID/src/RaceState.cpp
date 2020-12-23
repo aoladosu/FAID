@@ -13,11 +13,6 @@ int RaceState::update(StateNumber& stateVal)
 	ReadProcessMemory(gameData->process, (LPVOID)gameData->yAddr, &newY, sizeof(newY), NULL);
 	//ReadProcessMemory(gameData->process, (LPVOID)gameData->zAddr, &newZ, sizeof(z), NULL);
 
-	// get goal to drive to
-	setGoal();
-	adjustGoal();
-
-
 	// update variables
 	if ((newY != Y) || (newX != X)){
 		dirX = newX - X;
@@ -26,6 +21,10 @@ int RaceState::update(StateNumber& stateVal)
 		Y = newY;
 		Z = newZ;
 	}
+
+	// get goal to drive to
+	setGoal();
+	adjustGoal();
 
 	// get direction to drive towards
 	int direction = getDriveDirection();
