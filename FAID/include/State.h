@@ -42,5 +42,6 @@ protected:
 
 	virtual StateNumber nextState() = 0;
 	void updateCarInfo();
+	int getDriveDirection();
 };
 

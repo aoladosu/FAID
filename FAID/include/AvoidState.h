@@ -18,6 +18,10 @@ public:
 	void enterState(StateData stateData) override;
 	StateData exitState() override;
 
+protected:
+	// functions
+	StateNumber nextState() override;
+
 private:
 	// variables
 	int obstacleNum = -1;
@@ -26,13 +30,17 @@ private:
 	int obsX = 0;
 	int obsY = 0;
 	int obsAngle = 0;
+	int obsPiece = 0;
 	// these goal positions are where another position wants to go,
 	// not where this state wants to go
 	int endGoalX = 0;
 	int endGoalY = 0;
 
-protected:
-	// functions
-	StateNumber nextState() override;
+	void setGoal();
+
+	// avoid functions
+	void standardPavedRampAvoid(int &A1x, int &A1y, int &A2x, int &A2y, int L);
+	void dirtSpeedBumpAvoid(int &A1x, int &A1y, int &A2x, int &A2y, int L);
+
 };
 

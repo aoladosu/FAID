@@ -19,12 +19,10 @@ public:
 private:
 	// variables
 	short int currChkPt = -1;
-	const float PI = 3.14159;
 
 	// functions
 	void setGoal();
 	void adjustGoal();
-	int getDriveDirection();
 
 protected:
 	StateNumber nextState() override;

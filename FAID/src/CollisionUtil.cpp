@@ -24,6 +24,8 @@ bool obsCollision(int *jumps, int jumpSize, int *obstacles, int obsSize, int x, 
 	int radDist = 3000*3000, obsDist;		// r^2: maximum distance we can see forward
 	int xPos, yPos, sightAngle = 30;
 
+	// TODO: ray tracing
+
 
 	// check if object is within our sight radius and in front of us (angle checks second cond)
 	for (int i = 0; i < jumpSize * 4; i+=4) {
@@ -54,7 +56,7 @@ bool obsCollision(int *jumps, int jumpSize, int *obstacles, int obsSize, int x, 
 	return collision;
 }
 
-bool onJumpDirection(int jumpX, int jumpY, int dirX, int dirY, int angle, int x, int y)
+bool onJumpDirection(int jumpX, int jumpY, int dirX, int dirY, int angle, int x, int y, bool bidirectional)
 {
 	// check if the car is oriented such that it can jump off the ramp instead of crashing into it
 	// angles increase counter clockwise
@@ -82,6 +84,11 @@ bool onJumpDirection(int jumpX, int jumpY, int dirX, int dirY, int angle, int x,
 
 	int angleOffset = 45;
 	bool onJump = getAngle(dirX, dirY, jumpDirX+x, jumpDirY+y) <= angleOffset;
+	if (bidirectional) {
+		jumpDirX *= -1;
+		jumpDirY *= -1;
+		onJump = onJump || getAngle(dirX, dirY, jumpDirX + x, jumpDirY + y) <= angleOffset;
+	}
 	
 	return false;
 }

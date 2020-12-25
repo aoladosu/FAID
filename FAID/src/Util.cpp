@@ -114,14 +114,14 @@ int getStageData(int stage, int chkSize, int *&chkPoints, int jumpSize, int *&ju
 					jumps[jumpPos] = piece;
 					jumps[jumpPos + 1] = x;
 					jumps[jumpPos + 2] = y;
-					jumps[jumpPos + 3] = angle;
+					jumps[jumpPos + 3] = modifyAngle(angle);
 					jumpPos += 4;
 				}
 				else {
 					obstacles[obsPos] = piece;
 					obstacles[obsPos + 1] = x;
 					obstacles[obsPos + 2] = y;
-					obstacles[obsPos + 3] = angle;
+					obstacles[obsPos + 3] = modifyAngle(angle);
 					obsPos += 4;
 				}
 			}
@@ -164,6 +164,12 @@ int relevantPiece(int piece)
 	}
 
 	return pieceType;
+}
+
+int modifyAngle(int angle) {
+	int angle2 = angle;
+	if (angle2 == -90) angle2 = 270;
+	return angle2;
 }
 
 // memory
