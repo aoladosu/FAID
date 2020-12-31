@@ -143,7 +143,9 @@ void AvoidState::setGoal() {
 	}
 
 	// set goal to drive towards, pick the one closest to the goal
-	if (distSquared(A1x, A1y, endGoalX, endGoalY) < distSquared(A2x, A2y, endGoalX, endGoalY)) {
+	int goalDist1 = distSquared(A1x, A1y, endGoalX, endGoalY) + distSquared(A1x, A1y, X, Y);
+	int goalDist2 = distSquared(A2x, A2y, endGoalX, endGoalY) + distSquared(A2x, A2y, X, Y);
+	if (goalDist1 < goalDist2) {
 		goalX = A1x;
 		goalY = A1y;
 		goalZ = 0;
@@ -161,6 +163,15 @@ void AvoidState::standardPavedRampAvoid(int &A1x, int &A1y, int &A2x, int &A2y, 
 	// basic paved ramp
 
 	int a1 = 800, a2 = 500, b1 = 700, b2 = 700;
+
+	if (onJumpDir) {
+		// just go towards goal
+		A1x = endGoalX;
+		A2x = endGoalX;
+		A1y = endGoalY;
+		A2y = endGoalY;
+		return;
+	}
 
 	if (obsAngle == 0) {
 		if ((L == 1) || (L == 4)) {
@@ -234,7 +245,6 @@ void AvoidState::dirtSpeedBumpAvoid(int &A1x, int &A1y, int &A2x, int &A2y, int 
 	// dirt speed bumb
 
 	// just go towards goal
-	int multiplier = 10;
 	A1x = endGoalX;
 	A2x = endGoalX;
 	A1y = endGoalY;

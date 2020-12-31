@@ -13,3 +13,6 @@ bool onJumpDirection(int jumpX, int jumpY, int dirX, int dirY, int angle, int x,
 // data helper functions
 int distSquared(int x1, int y1, int x2, int y2);
 float getAngle(int dirX1, int dirY1, int dirX2, int dirY2);
+
+// intersect function
+bool intersect(int piece, int obsX, int obsY, int angle, int x, int y, int dirX, int dirY);

@@ -1,4 +1,5 @@
 #include "CollisionUtil.h"
+#include "Intersect.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -24,19 +25,18 @@ bool obsCollision(int *jumps, int jumpSize, int *obstacles, int obsSize, int x, 
 	int radDist = 3000*3000, obsDist;		// r^2: maximum distance we can see forward
 	int xPos, yPos, sightAngle = 30;
 
-	// TODO: ray tracing
-
-
 	// check if object is within our sight radius and in front of us (angle checks second cond)
 	for (int i = 0; i < jumpSize * 4; i+=4) {
 		xPos = jumps[i + 1];
 		yPos = jumps[i + 2];
 		obsDist = distSquared(x, y, xPos, yPos);
 		if ((obsDist < radDist) && (getAngle(dirX, dirY, xPos-x, yPos-y) < sightAngle)) {
-			radDist = obsDist;
-			object = i;
-			collision = true;
-			isJump = true;
+			if (intersect(jumps[i], xPos, yPos, obstacles[i + 3], x, y, dirX, dirY)) {
+				radDist = obsDist;
+				object = i;
+				collision = true;
+				isJump = true;
+			}
 		}
 	}
 	
@@ -46,10 +46,12 @@ bool obsCollision(int *jumps, int jumpSize, int *obstacles, int obsSize, int x, 
 		yPos = obstacles[i + 2];
 		obsDist = distSquared(x, y, xPos, yPos);
 		if ((obsDist < radDist) && (getAngle(dirX, dirY, xPos - x, yPos - y) < sightAngle)) {
-			radDist = obsDist;
-			object = i;
-			collision = true;
-			isJump = false;
+			if (intersect(obstacles[i], xPos, yPos, obstacles[i+3], x, y, dirX, dirY)) {
+				radDist = obsDist;
+				object = i;
+				collision = true;
+				isJump = false;
+			}
 		}
 	}
 	
@@ -90,7 +92,7 @@ bool onJumpDirection(int jumpX, int jumpY, int dirX, int dirY, int angle, int x,
 		onJump = onJump || getAngle(dirX, dirY, jumpDirX + x, jumpDirY + y) <= angleOffset;
 	}
 	
-	return false;
+	return onJump;
 }
 
 int distSquared(int x1, int y1, int x2, int y2)
@@ -108,6 +110,23 @@ float getAngle(int dirX1, int dirY1, int dirX2, int dirY2) {
 	float lenGoal = sqrt(dirX2 * dirX2 + dirY2 * dirY2);
 	float angle = acos(dot / (lenDir * lenGoal)) * 180 / PI;
 	return angle;
+}
+
+bool intersect(int piece, int obsX, int obsY, int angle, int x, int y, int dirX, int dirY)
+{
+	bool intersect = false;
+	switch (piece) {
+	case 26:
+		intersect = standardPavedRampIntersect(obsX, obsY, angle, x, y, dirX, dirY);
+		break;
+	case 33:
+		intersect = dirtSpeedBumpIntersect(obsX, obsY, angle, x, y, dirX, dirY);
+		break;
+	default:
+		std::cout << "An obstacle piece " << piece << " was not defined\n";
+	}
+
+	return intersect;
 }
 
 

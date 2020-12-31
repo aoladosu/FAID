@@ -25,6 +25,7 @@
     <ClCompile Include="src\GameData.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\RaceState.cpp" />
+    <ClCompile Include="src\Intersect.cpp" />
     <ClCompile Include="src\StartState.cpp" />
     <ClCompile Include="src\State.cpp" />
     <ClCompile Include="src\StateData.cpp" />
@@ -36,6 +37,7 @@
     <ClInclude Include="include\FAID.h" />
     <ClInclude Include="include\GameData.h" />
     <ClInclude Include="include\RaceState.h" />
+    <ClInclude Include="include\Intersect.h" />
     <ClInclude Include="include\StartState.h" />
     <ClInclude Include="include\State.h" />
     <ClInclude Include="include\StateData.h" />
