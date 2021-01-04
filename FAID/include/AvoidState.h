@@ -37,9 +37,11 @@ private:
 	int endGoalY = 0;
 
 	void setGoal();
+	
+	bool biDirectionalJump(int piece);
+	void setGoalDestination(int& A1x, int& A1y, int& A2x, int& A2y, int L, int heightUp, int heightDown, int widthLeft, int widthRight);
 
-	// avoid functions
-	void standardPavedRampAvoid(int &A1x, int &A1y, int &A2x, int &A2y, int L);
+	// avoid functions, exception cases
 	void dirtSpeedBumpAvoid(int &A1x, int &A1y, int &A2x, int &A2y, int L);
 
 };

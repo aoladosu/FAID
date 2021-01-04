@@ -37,8 +37,8 @@ void AvoidState::enterState(StateData stateData)
 		obsX = gameData->jumps[obstacleNum + 1];
 		obsY = gameData->jumps[obstacleNum + 2];
 		obsAngle = gameData->jumps[obstacleNum + 3];
-		bool bidirectional = gameData->jumps[obstacleNum] == 33;
-		onJumpDir = onJumpDirection(obsX, obsY, dirX, dirY, obsAngle, X, Y, bidirectional);
+		bool bidirectional = biDirectionalJump(obsPiece);
+		onJumpDir = onJumpDirection(obsPiece, obsX, obsY, dirX, dirY, obsAngle, X, Y, bidirectional);
 	}
 	else {
 		obsPiece = gameData->obstacles[obstacleNum];
@@ -49,6 +49,7 @@ void AvoidState::enterState(StateData stateData)
 
 	// set drive location
 	setGoal();
+
 }
 
 StateData AvoidState::exitState()
@@ -128,23 +129,76 @@ void AvoidState::setGoal() {
 	else if (angle <= 135) L = 3;
 	else L = 4;
 
-	// define two potential locations (A1, A2) = (left, right, or vice versa)
-	// to drive towards to get around the object
-	// call function that matches piece type
+	int heightUp, heightDown, widthLeft, widthRight;
+	bool defined = false;
 	switch (obsPiece) {
 	case 26:
-		standardPavedRampAvoid(A1x, A1y, A2x, A2y, L);
+		// basic paved ramp
+		heightUp = 800;
+		heightDown = 800;
+		widthLeft = 800;
+		widthRight = 800;
+		break;
+	case 28:
+		// double sided paved ramp
+		heightUp = 2500;
+		heightDown = 2500;
+		widthLeft = 900;
+		widthRight = 900;
+		break;
+	case 29:
+		// split paved ramp
+		heightUp = 2500;
+		heightDown = 2500;
+		widthLeft = 800;
+		widthRight = 800;
+		break;
+	case 30:
+		// landing paved ramp
+		heightUp = 1800;
+		heightDown = 3400;
+		widthLeft = 750;
+		widthRight = 750;
+		break;
+	case 32:
+		// small paved ramp
+		heightUp = 560;
+		heightDown = 520;
+		widthLeft = 200;
+		widthRight = 200;
 		break;
 	case 33:
+		// dirt speed bump
 		dirtSpeedBumpAvoid(A1x, A1y, A2x, A2y, L);
+		defined = true;
+		break;
+	case 34:
+		// large offroad ramp
+		heightUp = 2000;
+		heightDown = 2000;
+		widthLeft = 1300;
+		widthRight = 1300;
+		break;
+	case 35:
+		// small offroad ramp
+		heightUp = 860;
+		heightDown = 1000;
+		widthLeft = 650;
+		widthRight = 650;
 		break;
 	default:
-		std::cout << "An obstacle piece " << obsPiece << " was not defined\n";
+		std::cout << "An obstacle piece " << obsPiece << " was not defined in avoid state: setGoal\n";
+	}
+
+	// define two potential locations (A1, A2) = (left, right, or vice versa)
+	// to drive towards to get around the object
+	if (!defined) {
+		setGoalDestination(A1x, A1y, A2x, A2y, L, heightUp, heightDown, widthLeft, widthRight);
 	}
 
 	// set goal to drive towards, pick the one closest to the goal
-	int goalDist1 = distSquared(A1x, A1y, endGoalX, endGoalY) + distSquared(A1x, A1y, X, Y);
-	int goalDist2 = distSquared(A2x, A2y, endGoalX, endGoalY) + distSquared(A2x, A2y, X, Y);
+	int goalDist1 = distSquared(A1x, A1y, X, Y); //distSquared(A1x, A1y, endGoalX, endGoalY)
+	int goalDist2 = distSquared(A2x, A2y, X, Y); //distSquared(A2x, A2y, endGoalX, endGoalY)
 	if (goalDist1 < goalDist2) {
 		goalX = A1x;
 		goalY = A1y;
@@ -158,11 +212,33 @@ void AvoidState::setGoal() {
 
 }
 
-void AvoidState::standardPavedRampAvoid(int &A1x, int &A1y, int &A2x, int &A2y, int L) {
-	// code: 26
-	// basic paved ramp
+bool AvoidState::biDirectionalJump(int piece)
+{
+	// check if a jump is bidirectional
+	bool biDirectional = false;
 
-	int a1 = 800, a2 = 500, b1 = 700, b2 = 700;
+	switch (piece) {
+	case 28:
+	case 29:
+	case 33:
+	case 34:
+	case 35:
+		biDirectional = true;
+		break;
+	}
+
+
+	return biDirectional;
+}
+
+void AvoidState::setGoalDestination(int& A1x, int& A1y, int& A2x, int& A2y, int L, int heightUp, int heightDown, int widthLeft, int widthRight)
+{
+	// A1x/y A2x/y are possible destinations to go to avoid the object on opposite sides of the obstacle
+	// with an angle of 0:
+	// heightUp: y offset to be behind the obstacle
+	// heightDown: y offset to be infront of the obstacle
+	// widthLeft: x offset to be to the left of the obstacle
+	// widthRight: x offset to be to the right of the obstacle
 
 	if (onJumpDir) {
 		// just go towards goal
@@ -176,68 +252,67 @@ void AvoidState::standardPavedRampAvoid(int &A1x, int &A1y, int &A2x, int &A2y, 
 	if (obsAngle == 0) {
 		if ((L == 1) || (L == 4)) {
 			// define L2,L3
-			A1x = obsX - b1;
+			A1x = obsX - widthLeft;
 			A1y = obsY;
-			A2x = obsX + b2;
+			A2x = obsX + widthRight;
 			A2y = obsY;
 		}
 		else {
 			// define L1,L4
 			A1x = obsX;
-			A1y = obsY + a1;
+			A1y = obsY + heightUp;
 			A2x = obsX;
-			A2y = obsY - a2;
+			A2y = obsY - heightDown;
 		}
 	}
 	else if (obsAngle == 90) {
 		if ((L == 1) || (L == 4)) {
 			// define L2,L3
 			A1x = obsX;
-			A1y = obsY - b1;
+			A1y = obsY - widthLeft;
 			A2x = obsX;
-			A2y = obsY + b2;
+			A2y = obsY + widthRight;
 		}
 		else {
 			// define L1,L4
-			A1x = obsX - a1;
+			A1x = obsX - heightUp;
 			A1y = obsY;
-			A2x = obsX + a2;
+			A2x = obsX + heightDown;
 			A2y = obsY;
 		}
 	}
 	else if (obsAngle == 180) {
 		if ((L == 1) || (L == 4)) {
 			// define L2,L3
-			A1x = obsX + b1;
+			A1x = obsX + widthLeft;
 			A1y = obsY;
-			A2x = obsX - b2;
+			A2x = obsX - widthRight;
 			A2y = obsY;
 		}
 		else {
 			// define L1,L4
 			A1x = obsX;
-			A1y = obsY - a1;
+			A1y = obsY - heightUp;
 			A2x = obsX;
-			A2y = obsY + a2;
+			A2y = obsY + heightDown;
 		}
 	}
 	else {
 		if ((L == 1) || (L == 4)) {
 			// define L2,L3
 			A1x = obsX;
-			A1y = obsY + b1;
+			A1y = obsY + widthLeft;
 			A2x = obsX;
-			A2y = obsY - b2;
+			A2y = obsY - widthRight;
 		}
 		else {
 			// define L1,L4
-			A1x = obsX + a1;
+			A1x = obsX + heightUp;
 			A1y = obsY;
-			A2x = obsX - a2;
+			A2x = obsX - heightDown;
 			A2y = obsY;
 		}
 	}
-
 }
 
 void AvoidState::dirtSpeedBumpAvoid(int &A1x, int &A1y, int &A2x, int &A2y, int L) {

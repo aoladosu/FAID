@@ -153,9 +153,13 @@ int relevantPiece(int piece)
 	switch (piece)
 	{
 	case 26:
-		pieceType = JUMP;
-		break;
+	case 28:
+	case 29:
+	case 30:
+	case 32:
 	case 33:
+	case 34:
+	case 35:
 		pieceType = JUMP;
 		break;
 	default:
